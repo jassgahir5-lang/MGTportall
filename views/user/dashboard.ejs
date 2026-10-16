@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal — Campus Event & Pass Ecosystem</title>
+  <meta name="description" content="Discover campus events, reserve verified seats, and manage your digital QR passes in real-time.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-portal sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="/user/dashboard">
+        <div class="brand-icon-nav"><i class="bi bi-calendar2-event-fill"></i></div>
+        <span>CAMPUS NEXUS</span>
+      </a>
+
+      <div class="d-flex align-items-center gap-3">
+        <a href="/user/profile" class="user-pill text-decoration-none">
+          <i class="bi bi-person-circle fs-6" style="color: var(--liquid-cyan);"></i>
+          <span><%= user.name %></span>
+          <span class="role-badge">Student</span>
+        </a>
+        <a href="/auth/logout" class="btn-nav-logout">
+          <i class="bi bi-box-arrow-right me-1"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+
+    <% if (message) { %>
+      <div class="alert-liquid alert-liquid-success mb-4" role="alert">
+        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+        <div class="fw-semibold"><%= message %></div>
+      </div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="alert-liquid alert-liquid-danger mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+        <div class="fw-semibold"><%= error %></div>
+      </div>
+    <% } %>
+
+    <div class="hero-banner mb-4">
+      <div class="row align-items-center">
+        <div class="col-lg-8 position-relative" style="z-index: 2;">
+          <div class="hero-badge">
+            <span class="dot"></span>
+            FALL 2026 • REAL-TIME SEAT BOOKING ACTIVE
+          </div>
+          <h1 class="fw-extrabold display-6 mb-2" style="letter-spacing: -0.03em;">
+            Welcome back, <%= user.name %>! 👋
+          </h1>
+          <p class="text-white-50 fs-6 mb-4" style="max-width: 620px; line-height: 1.6;">
+            Explore university activities, reserve certified seats with instant confirmation, and carry your cryptographic QR pass anywhere on your device.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="#portalTabs" class="btn-liquid">
+              <i class="bi bi-compass-fill"></i> Explore Available Events
+            </a>
+            <button class="btn-liquid-outline" onclick="document.getElementById('tickets-tab').click(); window.location.hash = 'portalTabs';">
+              <i class="bi bi-ticket-perforated-fill"></i> My Issued Passes (<%= myEvents.length %>)
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-4 d-none d-lg-block position-relative" style="z-index: 2;">
+          <div class="p-4 rounded-4" style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="text-uppercase fw-bold text-white-50 fs-8 tracking-wider">Student Activity ID</span>
+              <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1 fs-8">Active</span>
+            </div>
+            <h5 class="fw-bold text-white mb-1"><%= user.name %></h5>
+            <small class="text-white-50 d-block mb-3"><%= user.email %></small>
+            <div class="pt-3 border-top border-white border-opacity-10 d-flex justify-content-between text-white fs-8">
+              <span>Passes Held: <strong><%= myEvents.length %></strong></span>
+              <span>Pass Status: <strong class="text-info">Authorized</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="campus-ticker animate-in animate-delay-1">
+      <div class="ticker-badge">
+        <span class="pulse-dot"></span> Live Notice
+      </div>
+      <div class="ticker-content">
+        <span>📢 Real-time QR Gate Pass validation is now active for all upcoming campus events • Please present digital or printed pass at auditorium check-in desks • Early seating opens 30 minutes prior to event start.</span>
+      </div>
+      <span class="text-muted fs-8 d-none d-md-inline flex-shrink-0"><i class="bi bi-shield-check text-success me-1"></i> Verified Campus Dispatch</span>
+    </div>
+
+    <div class="row g-3 mb-5 animate-in animate-delay-2">
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">My Active Passes</span>
+            <div class="stat-icon-wrap icon-liquid-indigo">
+              <i class="bi bi-ticket-detailed-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= myEvents.length %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-arrow-right-circle text-primary"></i> Confirmed bookings
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Open Events</span>
+            <div class="stat-icon-wrap icon-liquid-emerald">
+              <i class="bi bi-calendar-check-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= events.length %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-broadcast text-success"></i> Across all departments
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Entry Pass Speed</span>
+            <div class="stat-icon-wrap icon-liquid-violet">
+              <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value">&lt; 3s</div>
+            <div class="stat-subtext">
+              <i class="bi bi-qr-code text-purple"></i> Instant Gate QR Scan
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Attendance Standing</span>
+            <div class="stat-icon-wrap icon-liquid-amber">
+              <i class="bi bi-award-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value">100%</div>
+            <div class="stat-subtext">
+              <i class="bi bi-patch-check-fill text-warning"></i> Activity Verified
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3 animate-in animate-delay-2" id="portalTabs">
+
+      <ul class="nav nav-pills nav-pills-portal gap-2">
+        <li class="nav-item">
+          <button class="nav-link active" id="browse-tab" data-bs-toggle="tab" data-bs-target="#browse">
+            <i class="bi bi-grid-fill me-1"></i> Browse Events (<%= events.length %>)
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets">
+            <i class="bi bi-ticket-perforated-fill me-1"></i> My Passes (<%= myEvents.length %>)
+          </button>
+        </li>
+      </ul>
+
+      <div class="search-box-glass">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by title or venue..." onkeyup="filterEvents()">
+      </div>
+
+    </div>
+
+    <div class="d-flex align-items-center gap-2 mb-4 overflow-x-auto pb-2 animate-in animate-delay-3">
+      <span class="filter-pill active" onclick="setCategoryFilter('', this)">
+        <i class="bi bi-collection me-1"></i> All Categories
+      </span>
+      <span class="filter-pill" onclick="setCategoryFilter('Technical', this)">
+        <i class="bi bi-cpu me-1"></i> Technical
+      </span>
+      <span class="filter-pill" onclick="setCategoryFilter('Cultural Fest', this)">
+        <i class="bi bi-music-note-beamed me-1"></i> Cultural Fest
+      </span>
+      <span class="filter-pill" onclick="setCategoryFilter('Sports', this)">
+        <i class="bi bi-trophy me-1"></i> Sports
+      </span>
+      <span class="filter-pill" onclick="setCategoryFilter('Workshop', this)">
+        <i class="bi bi-tools me-1"></i> Workshops & Seminars
+      </span>
+    </div>
+
+    <div class="tab-content" id="portalTabContent">
+
+      <div class="tab-pane fade show active" id="browse">
+        <% if (events.length === 0) { %>
+          <div class="glass-panel p-5 text-center my-4">
+            <div class="brand-icon-nav mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: rgba(99, 102, 241, 0.15); color: var(--clr-primary-600);">
+              <i class="bi bi-calendar-x"></i>
+            </div>
+            <h4 class="fw-bold mb-2">No Active Campus Events Yet</h4>
+            <p class="text-secondary fs-6 mb-3" style="max-width: 440px; margin: 0 auto;">Check back soon! Department admins are publishing upcoming schedules and hackathons.</p>
+          </div>
+        <% } else { %>
+          <div class="row g-4" id="eventCardGrid">
+            <% events.forEach((event, idx) => { %>
+              <% 
+                const registeredCount = parseInt(event.registered_count || 0, 10);
+                const capacity = parseInt(event.capacity || 1, 10);
+                const percentFilled = Math.min(Math.round((registeredCount / capacity) * 100), 100);
+                const seatsLeft = Math.max(capacity - registeredCount, 0);
+                const eventDate = new Date(event.start_time);
+                const monthStr = eventDate.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+                const dayStr = eventDate.getDate();
+                const timeStr = eventDate.toLocaleString('en-US', { timeStyle: 'short' });
+                const isFull = registeredCount >= capacity;
+              %>
+              <div class="col-12 col-md-6 col-lg-4 animate-in" style="animation-delay: <%= 0.06 * (idx % 8) %>s;">
+                <div class="event-card">
+
+                  <div class="event-card-header">
+                    <div class="date-ribbon-glass">
+                      <span class="month"><%= monthStr %></span>
+                      <span class="day"><%= dayStr %></span>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-end gap-1">
+                      <span class="badge-cat-glass"><%= event.category_name || 'Campus Event' %></span>
+                      <% if (event.is_registered) { %>
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1 fs-8">
+                          <i class="bi bi-check2"></i> Enrolled
+                        </span>
+                      <% } else if (isFull) { %>
+                        <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 px-2 py-1 fs-8">
+                          Full
+                        </span>
+                      <% } else if (seatsLeft <= 5) { %>
+                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50 px-2 py-1 fs-8">
+                          Only <%= seatsLeft %> Left
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-2"><%= event.title %></h5>
+                    <p class="event-desc"><%= event.description %></p>
+
+                    <div class="event-meta-pill">
+                      <div class="event-meta-item">
+                        <i class="bi bi-geo-alt-fill text-primary"></i>
+                        <span><strong>Venue:</strong> <%= event.venue_name || 'Main Campus Hall' %></span>
+                      </div>
+                      <div class="event-meta-item">
+                        <i class="bi bi-clock-fill text-info"></i>
+                        <span><strong>Schedule:</strong> <%= timeStr %> (Campus Local Time)</span>
+                      </div>
+                    </div>
+
+                    <div class="event-perks">
+                      <span class="perk-tag"><i class="bi bi-qr-code"></i> Instant QR Pass</span>
+                      <span class="perk-tag"><i class="bi bi-patch-check"></i> Attendance Credit</span>
+                      <span class="perk-tag"><i class="bi bi-people"></i> Limited Seating</span>
+                    </div>
+
+                    <div class="mb-4">
+                      <div class="d-flex justify-content-between align-items-center mb-1 fs-8">
+                        <span class="text-secondary fw-semibold">Seat Utilization</span>
+                        <span class="fw-bold <%= isFull ? 'text-danger' : 'text-primary' %>">
+                          <%= registeredCount %> / <%= capacity %> seats (<%= percentFilled %>%)
+                        </span>
+                      </div>
+                      <div class="progress-liquid">
+                        <div class="progress-bar <%= isFull ? 'bg-danger' : '' %>" style="width: <%= percentFilled %>%;"></div>
+                      </div>
+                    </div>
+
+                    <div class="mt-auto">
+                      <% if (event.is_registered) { %>
+                        <button class="btn btn-glass-secondary w-100 py-2 text-success fw-bold" onclick="document.getElementById('tickets-tab').click(); window.location.hash = 'portalTabs';">
+                          <i class="bi bi-check-circle-fill me-1"></i> Pass Confirmed • View Pass
+                        </button>
+                      <% } else if (isFull) { %>
+                        <button class="btn btn-glass-secondary w-100 py-2 text-muted fw-semibold" disabled>
+                          <i class="bi bi-slash-circle me-1"></i> Event Fully Booked
+                        </button>
+                      <% } else { %>
+                        <button type="button" class="btn-liquid w-100 py-2" data-bs-toggle="modal" data-bs-target="#registerModal<%= event.id %>">
+                          <span>Reserve My Seat</span>
+                          <i class="bi bi-arrow-right"></i>
+                        </button>
+                      <% } %>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="registerModal<%= event.id %>" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content modal-content-glass">
+                    <div class="modal-header border-0 pb-0 pt-4 px-4">
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="brand-icon-nav" style="width: 42px; height: 42px; font-size: 1.1rem;">
+                          <i class="bi bi-ticket-perforated"></i>
+                        </div>
+                        <div>
+                          <h5 class="fw-bold mb-0">Confirm Pass Reservation</h5>
+                          <small class="text-secondary">Official Student Entry Permit</small>
+                        </div>
+                      </div>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                      <div class="p-3 mb-3 rounded-3" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <h6 class="fw-bold text-dark mb-1"><%= event.title %></h6>
+                        <p class="text-secondary fs-8 mb-2"><%= event.description %></p>
+                        
+                        <div class="d-flex flex-column gap-1 fs-8 text-secondary">
+                          <div><i class="bi bi-geo-alt text-primary me-1"></i> <strong>Venue:</strong> <%= event.venue_name || 'Main Hall' %></div>
+                          <div><i class="bi bi-calendar-event text-info me-1"></i> <strong>Date & Time:</strong> <%= new Date(event.start_time).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' }) %></div>
+                          <div><i class="bi bi-person-badge text-success me-1"></i> <strong>Student Holder:</strong> <%= user.name %> (<%= user.email %>)</div>
+                        </div>
+                      </div>
+
+                      <form action="/user/register-event/<%= event.id %>" method="POST">
+                        <div class="mb-3">
+                          <label class="form-label-glass">
+                            <i class="bi bi-sliders"></i> Attendance Preference
+                          </label>
+                          <select class="form-select form-select-glass" name="preference">
+                            <option value="In-Person Standard">Standard Seating (General Auditorium Access)</option>
+                            <option value="Front Row Student">Front Row Active Participant</option>
+                            <option value="Team / Group">Department Representative Delegated</option>
+                          </select>
+                        </div>
+
+                        <div class="p-3 mb-4 rounded-3" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+                          <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check text-success fs-6"></i>
+                            <span class="fs-8 text-secondary">A unique encrypted QR pass will be immediately generated and linked to your student ID.</span>
+                          </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                          <button type="button" class="btn btn-glass-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn-liquid px-4">
+                            <i class="bi bi-check-circle-fill"></i> Generate Entry Pass
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="tab-pane fade" id="tickets">
+        <% if (myEvents.length === 0) { %>
+          <div class="glass-panel p-5 text-center my-4">
+            <div class="brand-icon-nav mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: rgba(99, 102, 241, 0.15); color: var(--clr-primary-600);">
+              <i class="bi bi-ticket-detailed"></i>
+            </div>
+            <h4 class="fw-bold mb-2">No Passes Issued Yet</h4>
+            <p class="text-secondary fs-6 mb-4" style="max-width: 440px; margin: 0 auto;">
+              You have not booked seats for any upcoming events. Browse available campus activities to reserve your entry pass!
+            </p>
+            <button class="btn-liquid" onclick="document.getElementById('browse-tab').click();">
+              <i class="bi bi-calendar-plus me-1"></i> Browse & Reserve Now
+            </button>
+          </div>
+        <% } else { %>
+          <div class="row g-4">
+            <% myEvents.forEach((ticket, idx) => { %>
+              <div class="col-12 col-md-6 animate-in" style="animation-delay: <%= 0.08 * idx %>s;">
+                <div class="ticket-stub-liquid">
+                  <div class="ticket-notch-left"></div>
+                  <div class="ticket-notch-right"></div>
+
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge-cat-glass" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border-color: rgba(99, 102, 241, 0.4);">
+                      <%= ticket.category_name || 'Official Entry Pass' %>
+                    </span>
+                    <span class="ticket-id-badge">PASS #TKN-00<%= ticket.ticket_id %></span>
+                  </div>
+                  
+                  <h4 class="fw-bold text-white mb-1" style="letter-spacing: -0.02em;"><%= ticket.title %></h4>
+                  <p class="mb-3 text-white-50 fs-7">
+                    <i class="bi bi-geo-alt-fill text-info me-1"></i> <%= ticket.venue_name || 'Main Campus Auditorium' %>
+                  </p>
+                  
+                  <div class="ticket-details-box d-flex justify-content-between align-items-center">
+                    <div>
+                      <small class="text-white-50 d-block fs-8 text-uppercase tracking-wider">Pass Holder</small>
+                      <span class="text-white fw-bold fs-7"><%= user.name %></span>
+                    </div>
+                    <div class="text-end">
+                      <small class="text-white-50 d-block fs-8 text-uppercase tracking-wider">Event Schedule</small>
+                      <span class="text-white fs-7"><%= new Date(ticket.start_time).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) %></span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-between pt-2">
+                    <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-2 rounded-3 px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#ticketModal<%= ticket.id %>">
+                      <i class="bi bi-qr-code-scan text-info"></i> View QR Pass
+                    </button>
+
+                    <form action="/user/cancel-event/<%= ticket.id %>" method="POST" onsubmit="return confirm('Cancel registration for this event? Your seat will be reopened for other students.');">
+                      <button type="submit" class="btn btn-link text-decoration-none p-0 fw-semibold text-danger fs-7 d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-x-circle"></i> Cancel Pass
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="ticketModal<%= ticket.id %>" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content modal-content-glass text-center p-4">
+                    <div class="modal-header border-0 pb-0 justify-content-end">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body pt-0">
+                      
+                      <div class="hero-badge mx-auto mb-3" style="font-size: 0.72rem; padding: 6px 16px;">
+                        <span class="dot"></span> OFFICIAL CAMPUS PASS TOKEN
+                      </div>
+
+                      <h4 class="fw-bold mb-1" style="letter-spacing: -0.02em;"><%= ticket.title %></h4>
+                      <p class="text-secondary fs-8 mb-4">Present this digital QR token at the <%= ticket.venue_name %> gate checkpoint.</p>
+
+                      <div class="p-4 rounded-4 mb-3 d-inline-block" style="background: white; border: 2px dashed #cbd5e1; box-shadow: 0 12px 30px rgba(0,0,0,0.08);">
+                        <i class="bi bi-qr-code-scan display-1 text-dark"></i>
+                      </div>
+
+                      <h6 class="fw-bold text-dark mb-0"><%= user.name %></h6>
+                      <small class="text-muted d-block mb-3" style="font-family: monospace; letter-spacing: 0.05em;">Token ID: #TKN-00<%= ticket.ticket_id %></small>
+
+                      <div class="p-3 mb-4 rounded-3 text-start fs-8" style="background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.15);">
+                        <div class="d-flex justify-content-between mb-1">
+                          <span class="text-secondary">Venue Assigned:</span>
+                          <span class="fw-bold text-dark"><%= ticket.venue_name || 'Auditorium A' %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                          <span class="text-secondary">Verification Status:</span>
+                          <span class="fw-bold text-success"><i class="bi bi-shield-fill-check"></i> Cryptographically Valid</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <span class="text-secondary">Issued On:</span>
+                          <span class="text-dark"><%= new Date(ticket.registered_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %></span>
+                        </div>
+                      </div>
+
+                      <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-liquid-outline btn-sm px-4" onclick="window.print()">
+                          <i class="bi bi-printer-fill me-1"></i> Print / Save PDF
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+
+    <div class="mt-5 pt-4 animate-in animate-delay-4">
+      
+      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+          <h4 class="fw-bold mb-1" style="letter-spacing: -0.02em;">Campus Venues & Fast-Track Access</h4>
+          <p class="text-secondary fs-7 mb-0">Learn how automated turnstiles and check-in desks process student digital passes.</p>
+        </div>
+        <span class="badge-cat-glass">Campus Information Guide</span>
+      </div>
+
+      <div class="row g-4 mb-5">
+        <div class="col-md-4">
+          <div class="glass-panel p-4 h-100">
+            <div class="brand-icon-nav mb-3" style="width: 44px; height: 44px; font-size: 1.1rem; background: linear-gradient(135deg, #3b82f6, #06b6d4);">
+              <i class="bi bi-1-circle-fill"></i>
+            </div>
+            <h5 class="fw-bold mb-2">1. One-Click Booking</h5>
+            <p class="text-secondary fs-7 mb-0">Browse published activities, check available seats in real-time, and reserve your guaranteed entry ticket.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="glass-panel p-4 h-100">
+            <div class="brand-icon-nav mb-3" style="width: 44px; height: 44px; font-size: 1.1rem; background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+              <i class="bi bi-2-circle-fill"></i>
+            </div>
+            <h5 class="fw-bold mb-2">2. Digital QR Generation</h5>
+            <p class="text-secondary fs-7 mb-0">Your pass is immediately loaded into your "My Passes" vault with a high-resolution QR scanner token.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="glass-panel p-4 h-100">
+            <div class="brand-icon-nav mb-3" style="width: 44px; height: 44px; font-size: 1.1rem; background: linear-gradient(135deg, #10b981, #06b6d4);">
+              <i class="bi bi-3-circle-fill"></i>
+            </div>
+            <h5 class="fw-bold mb-2">3. Instant Gate Clearance</h5>
+            <p class="text-secondary fs-7 mb-0">Scan at entrance turnstiles or show on mobile. Attendance credit logs automatically for academic certificates.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-4 mb-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-primary me-2"></i>Campus Event Venues Directory</h5>
+        <div class="row g-3 fs-7 text-secondary">
+          <div class="col-md-3">
+            <div class="p-3 rounded-3 bg-white bg-opacity-60 border border-light-subtle">
+              <strong class="text-dark d-block">Main Central Auditorium</strong>
+              <span>Capacity: 500 Seats • Hall A</span>
+              <small class="text-muted d-block mt-1">Equipped with 4K Projection & Stage Lighting</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="p-3 rounded-3 bg-white bg-opacity-60 border border-light-subtle">
+              <strong class="text-dark d-block">Tech Innovation Hub</strong>
+              <span>Capacity: 150 Seats • Lab 3</span>
+              <small class="text-muted d-block mt-1">High-Speed LAN & Hackathon Power Stations</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="p-3 rounded-3 bg-white bg-opacity-60 border border-light-subtle">
+              <strong class="text-dark d-block">Open Amphitheatre</strong>
+              <span>Capacity: 800 Seats • North Lawns</span>
+              <small class="text-muted d-block mt-1">Acoustic Shell for Fests & Band Performances</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="p-3 rounded-3 bg-white bg-opacity-60 border border-light-subtle">
+              <strong class="text-dark d-block">Athletics Arena</strong>
+              <span>Capacity: 1200 Seats • Sports Complex</span>
+              <small class="text-muted d-block mt-1">Olympic Turf & Digital Scoreboards</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let activeCategory = '';
+
+    function setCategoryFilter(category, element) {
+      activeCategory = category;
+      document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      filterEvents();
+    }
+
+    function filterEvents() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('#eventCardGrid .col-12');
+
+      cards.forEach(card => {
+        const title = card.querySelector('h5')?.innerText.toLowerCase() || '';
+        const venue = card.querySelector('.bi-geo-alt-fill')?.parentElement?.innerText.toLowerCase() || '';
+        const catBadge = card.querySelector('.badge-cat-glass')?.innerText.toLowerCase() || '';
+
+        const matchesSearch = title.includes(query) || venue.includes(query);
+        const matchesCategory = !activeCategory || catBadge.includes(activeCategory.toLowerCase());
+
+        if (matchesSearch && matchesCategory) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publish Event — Campus Admin Studio</title>
+  <meta name="description" content="Create and publish new campus activities, specify venue capacities, and release digital passes.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-portal sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard">
+        <div class="brand-icon-nav" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+          <i class="bi bi-calendar-plus-fill"></i>
+        </div>
+        <span>CAMPUS ADMIN STUDIO</span>
+      </a>
+      <a href="/admin/dashboard" class="btn-nav-logout">
+        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-lg-7">
+        <div class="glass-form-card p-4 p-md-5 animate-in">
+          
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <div class="hero-badge mb-2" style="font-size: 0.72rem; padding: 4px 14px;">
+                <span class="dot"></span> EVENT PUBLISHING STUDIO
+              </div>
+              <h3 class="fw-extrabold text-dark mb-1" style="letter-spacing: -0.03em;">Create Campus Event</h3>
+              <p class="text-secondary fs-7 mb-0">Fill out details below to release real-time student registration passes.</p>
+            </div>
+          </div>
+
+          <% if (error) { %>
+            <div class="alert-liquid alert-liquid-danger mb-4" role="alert">
+              <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+              <div><%= error %></div>
+            </div>
+          <% } %>
+
+          <form action="/admin/events/create" method="POST" id="createEventForm">
+            
+            <div class="mb-3">
+              <label class="form-label-glass">
+                <i class="bi bi-fonts"></i> Event Title
+              </label>
+              <input type="text" name="title" id="inputTitle" class="form-control form-control-glass" placeholder="e.g. Annual Autonomous Robotics Hackathon 2026" required oninput="updateLivePreview()">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label-glass">
+                <i class="bi bi-card-text"></i> Event Description & Guidelines
+              </label>
+              <textarea name="description" id="inputDesc" class="form-control form-control-glass" rows="3" placeholder="Provide schedule breakdown, rules, certificate eligibility, and guidelines..." required oninput="updateLivePreview()"></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-tag"></i> Category
+                </label>
+                <select name="category_id" id="inputCategory" class="form-select form-select-glass" required onchange="updateLivePreview()">
+                  <option value="">-- Select Category --</option>
+                  <% categories.forEach(cat => { %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                  <% }); %>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-geo-alt"></i> Assigned Venue
+                </label>
+                <select name="venue_id" id="inputVenue" class="form-select form-select-glass" required onchange="updateLivePreview()">
+                  <option value="">-- Select Campus Venue --</option>
+                  <% venues.forEach(v => { %>
+                    <option value="<%= v.id %>" data-cap="<%= v.capacity %>"><%= v.name %> (Max Hall Cap: <%= v.capacity %>)</option>
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-calendar-event"></i> Start Time
+                </label>
+                <input type="datetime-local" name="start_time" id="inputStartTime" class="form-control form-control-glass" required oninput="updateLivePreview()">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-calendar-check"></i> End Time
+                </label>
+                <input type="datetime-local" name="end_time" class="form-control form-control-glass" required>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-people"></i> Max Registration Capacity
+                </label>
+                <input type="number" name="capacity" id="inputCapacity" class="form-control form-control-glass" placeholder="e.g. 100" min="1" required oninput="updateLivePreview()">
+                <small class="text-secondary fs-8">Seat bookings automatically lock when this limit is reached.</small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-image"></i> Event Poster Banner URL (Optional)
+                </label>
+                <input type="url" name="poster_url" class="form-control form-control-glass" placeholder="https://images.unsplash.com/...">
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
+              <a href="/admin/dashboard" class="btn btn-glass-secondary px-4">Cancel</a>
+              <button type="submit" class="btn-liquid px-4">
+                <i class="bi bi-send-check-fill"></i> Publish to Student Portal
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="live-preview-box animate-in animate-delay-2">
+          
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="bi bi-eye-fill text-primary me-1"></i> Live Student Card Preview
+            </h6>
+            <span class="badge-cat-glass">Real-Time Sync</span>
+          </div>
+
+          <div class="event-card shadow-lg" style="background: rgba(255, 255, 255, 0.9);">
+            <div class="event-card-header">
+              <div class="date-ribbon-glass">
+                <span class="month" id="previewMonth">OCT</span>
+                <span class="day" id="previewDay">24</span>
+              </div>
+              <span class="badge-cat-glass" id="previewCategory">Technical</span>
+            </div>
+
+            <div class="card-body">
+              <h5 class="fw-bold mb-2" id="previewTitle">Annual Autonomous Robotics Hackathon 2026</h5>
+              <p class="event-desc" id="previewDesc">Provide schedule breakdown, rules, certificate eligibility, and guidelines...</p>
+
+              <div class="event-meta-pill">
+                <div class="event-meta-item">
+                  <i class="bi bi-geo-alt-fill text-primary"></i>
+                  <span id="previewVenue">Venue: Main Central Auditorium</span>
+                </div>
+                <div class="event-meta-item">
+                  <i class="bi bi-clock-fill text-info"></i>
+                  <span id="previewTime">Schedule: 10:00 AM (Campus Time)</span>
+                </div>
+              </div>
+
+              <div class="event-perks">
+                <span class="perk-tag"><i class="bi bi-qr-code"></i> Instant QR Pass</span>
+                <span class="perk-tag"><i class="bi bi-patch-check"></i> Attendance Credit</span>
+              </div>
+
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1 fs-8">
+                  <span class="text-secondary fw-semibold">Seat Utilization</span>
+                  <span class="fw-bold text-primary" id="previewCapacityLabel">0 / 100 seats (0%)</span>
+                </div>
+                <div class="progress-liquid">
+                  <div class="progress-bar" style="width: 5%;"></div>
+                </div>
+              </div>
+
+              <button class="btn-liquid w-100 py-2" type="button" disabled>
+                <span>Reserve My Seat</span>
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3 mt-3 rounded-3 fs-8 text-secondary" style="background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.15);">
+            <i class="bi bi-info-circle-fill text-primary me-1"></i>
+            This live card simulates how the event will appear on student dashboards instantly after publishing.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function updateLivePreview() {
+      const title = document.getElementById('inputTitle').value.trim();
+      const desc = document.getElementById('inputDesc').value.trim();
+      const catSelect = document.getElementById('inputCategory');
+      const venueSelect = document.getElementById('inputVenue');
+      const startTime = document.getElementById('inputStartTime').value;
+      const capacity = document.getElementById('inputCapacity').value;
+
+      if (title) document.getElementById('previewTitle').innerText = title;
+      if (desc) document.getElementById('previewDesc').innerText = desc;
+
+      if (catSelect.selectedIndex > 0) {
+        document.getElementById('previewCategory').innerText = catSelect.options[catSelect.selectedIndex].text;
+      }
+
+      if (venueSelect.selectedIndex > 0) {
+        const venueText = venueSelect.options[venueSelect.selectedIndex].text.split('(')[0].trim();
+        document.getElementById('previewVenue').innerHTML = `<strong>Venue:</strong> ${venueText}`;
+      }
+
+      if (startTime) {
+        const d = new Date(startTime);
+        if (!isNaN(d)) {
+          document.getElementById('previewMonth').innerText = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+          document.getElementById('previewDay').innerText = d.getDate();
+          document.getElementById('previewTime').innerHTML = `<strong>Schedule:</strong> ${d.toLocaleString('en-US', { timeStyle: 'short' })}`;
+        }
+      }
+
+      if (capacity) {
+        document.getElementById('previewCapacityLabel').innerText = `0 / ${capacity} seats (0%)`;
+      }
+    }
+  </script>
+</body>
+</html>

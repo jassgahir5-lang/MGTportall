@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Command Center — Campus Event Portal</title>
+  <meta name="description" content="Central administrative dashboard for managing campus events, venue capacities, and student attendee rosters.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-portal sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard">
+        <div class="brand-icon-nav" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <span>CAMPUS ADMIN COMMAND</span>
+      </a>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="user-pill">
+          <i class="bi bi-person-circle fs-6" style="color: var(--liquid-cyan);"></i>
+          <span><%= user.name %></span>
+          <span class="role-badge" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">Administrator</span>
+        </div>
+        <a href="/auth/logout" class="btn-nav-logout">
+          <i class="bi bi-box-arrow-right me-1"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+
+    <div class="campus-ticker mb-4 animate-in">
+      <div class="ticker-badge" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
+        <span class="pulse-dot"></span> System Live
+      </div>
+      <div class="ticker-content">
+        <span>PostgreSQL Cloud: Connected • Real-Time Gate Scanner: Ready • Active Term: Fall 2026 • Real-Time Seat Synchronization: Operational</span>
+      </div>
+      <span class="text-secondary fs-8 d-none d-md-inline flex-shrink-0">
+        <i class="bi bi-clock-history me-1 text-primary"></i> Server Uptime: 99.98%
+      </span>
+    </div>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3 animate-in animate-delay-1">
+      <div>
+        <h2 class="fw-extrabold mb-1" style="letter-spacing: -0.03em;">Administrator Overview</h2>
+        <p class="text-secondary mb-0 fs-6">Manage university events, audit seating limits, and track student attendance rosters.</p>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="/admin/events/create" class="btn-liquid">
+          <i class="bi bi-plus-circle-fill"></i>
+          <span>Publish New Event</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4 animate-in animate-delay-2">
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Published Events</span>
+            <div class="stat-icon-wrap icon-liquid-indigo">
+              <i class="bi bi-calendar2-range-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= stats.events %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-check-circle-fill text-success"></i> Active on student portal
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Enrolled Students</span>
+            <div class="stat-icon-wrap icon-liquid-emerald">
+              <i class="bi bi-people-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= stats.users %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-person-check-fill text-emerald"></i> Verified accounts
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Total Passes Issued</span>
+            <div class="stat-icon-wrap icon-liquid-violet">
+              <i class="bi bi-ticket-perforated-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= stats.registrations %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-qr-code text-purple"></i> Cryptographic tokens
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Seat Fill Rate</span>
+            <div class="stat-icon-wrap icon-liquid-amber">
+              <i class="bi bi-pie-chart-fill"></i>
+            </div>
+          </div>
+          <div>
+            <% 
+              let totalCap = 0;
+              let totalRegs = 0;
+              events.forEach(e => {
+                totalCap += parseInt(e.capacity || 0, 10);
+                totalRegs += parseInt(e.registered_count || 0, 10);
+              });
+              const overallFill = totalCap > 0 ? Math.min(Math.round((totalRegs / totalCap) * 100), 100) : 0;
+            %>
+            <div class="stat-value"><%= overallFill %>%</div>
+            <div class="stat-subtext">
+              <i class="bi bi-graph-up-arrow text-warning"></i> Campus occupancy
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4 animate-in animate-delay-3">
+
+      <div class="col-lg-6">
+        <div class="glass-panel p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold mb-0">
+              <i class="bi bi-bar-chart-fill text-primary me-2"></i>Event Distribution by Category
+            </h5>
+            <span class="badge-cat-glass">Analytics</span>
+          </div>
+          <p class="text-secondary fs-7 mb-4">Breakdown of published activities across academic domains.</p>
+
+          <% if (!categoryStats || categoryStats.length === 0) { %>
+            <div class="text-center py-4 text-muted fs-7">No categories mapped yet.</div>
+          <% } else { %>
+            <div class="d-flex flex-column gap-3">
+              <% categoryStats.forEach(cat => { %>
+                <% 
+                  const count = parseInt(cat.event_count || 0, 10);
+                  const totalEv = parseInt(stats.events || 1, 10);
+                  const pct = totalEv > 0 ? Math.round((count / totalEv) * 100) : 0;
+                %>
+                <div>
+                  <div class="d-flex justify-content-between align-items-center mb-1 fs-7">
+                    <span class="fw-bold text-dark"><%= cat.name %></span>
+                    <span class="text-secondary fw-semibold"><%= count %> events (<%= pct %>%)</span>
+                  </div>
+                  <div class="progress-liquid">
+                    <div class="progress-bar" style="width: <%= pct %>%;"></div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="glass-panel p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold mb-0">
+              <i class="bi bi-shield-check text-success me-2"></i>Campus Event Protocol
+            </h5>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 fs-8">Standard</span>
+          </div>
+          <p class="text-secondary fs-7 mb-3">Operational checklists for student activity managers.</p>
+
+          <div class="d-flex flex-column gap-2 fs-7 text-secondary">
+            <div class="p-2 rounded-3 bg-white bg-opacity-60 border border-light-subtle d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary"></i>
+              <span><strong>Capacity Guard:</strong> Registrations automatically lock when venue limit is reached.</span>
+            </div>
+            <div class="p-2 rounded-3 bg-white bg-opacity-60 border border-light-subtle d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-info"></i>
+              <span><strong>CSV Roster Export:</strong> Download printable attendee logs anytime before event start.</span>
+            </div>
+            <div class="p-2 rounded-3 bg-white bg-opacity-60 border border-light-subtle d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-success"></i>
+              <span><strong>Fast Verification:</strong> Student QR tokens can be scanned on mobile or handheld scanners.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="glass-table-card animate-in animate-delay-4">
+      <div class="glass-table-header">
+        <div>
+          <h5 class="fw-bold mb-1">Active Campus Events</h5>
+          <small class="text-secondary">Review scheduled events, venue utilization, and access real-time rosters.</small>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="search-box-glass" style="min-width: 240px;">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" id="adminSearchInput" class="form-control" placeholder="Search events..." onkeyup="filterAdminEvents()">
+          </div>
+          <span class="badge-cat-glass"><%= events.length %> total</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-glass-table align-middle" id="adminEventsTable">
+          <thead>
+            <tr>
+              <th>Event Title</th>
+              <th>Category</th>
+              <th>Venue</th>
+              <th>Capacity Utilization</th>
+              <th>Schedule Time</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (events.length === 0) { %>
+              <tr>
+                <td colspan="6" class="text-center py-5">
+                  <div class="py-4">
+                    <i class="bi bi-calendar-x text-muted fs-1 d-block mb-3"></i>
+                    <h5 class="fw-bold text-dark mb-1">No Events Published Yet</h5>
+                    <p class="text-secondary fs-7 mb-3">Add your first campus workshop or tournament to open registrations.</p>
+                    <a href="/admin/events/create" class="btn-liquid btn-sm px-3">+ Publish Event</a>
+                  </div>
+                </td>
+              </tr>
+            <% } else { %>
+              <% events.forEach(event => { %>
+                <% 
+                  const registeredCount = parseInt(event.registered_count || 0, 10);
+                  const capacity = parseInt(event.capacity || 1, 10);
+                  const percentFilled = Math.min(Math.round((registeredCount / capacity) * 100), 100);
+                  const isFull = registeredCount >= capacity;
+                %>
+                <tr>
+                  <td>
+                    <div class="fw-bold text-dark fs-6"><%= event.title %></div>
+                    <small class="text-secondary text-truncate d-block" style="max-width: 240px;"><%= event.description %></small>
+                  </td>
+                  <td>
+                    <span class="badge-cat-glass"><%= event.category_name || 'General' %></span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-1 text-secondary fs-7">
+                      <i class="bi bi-geo-alt-fill text-primary"></i>
+                      <span><%= event.venue_name || 'Unassigned Venue' %></span>
+                    </div>
+                  </td>
+                  <td style="min-width: 190px;">
+                    <div class="d-flex justify-content-between fs-8 mb-1">
+                      <span class="fw-bold text-dark"><%= registeredCount %> / <%= capacity %> seats</span>
+                      <span class="fw-semibold <%= isFull ? 'text-danger' : 'text-primary' %>"><%= percentFilled %>%</span>
+                    </div>
+                    <div class="progress-liquid">
+                      <div class="progress-bar <%= isFull ? 'bg-danger' : '' %>" style="width: <%= percentFilled %>%;"></div>
+                    </div>
+                  </td>
+                  <td class="fs-7 text-secondary">
+                    <i class="bi bi-clock me-1 text-info"></i>
+                    <%= new Date(event.start_time).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) %>
+                  </td>
+                  <td class="text-end">
+                    <div class="d-inline-flex align-items-center gap-2">
+                      <a href="/admin/events/<%= event.id %>/attendees" class="btn btn-sm btn-liquid-outline py-1 px-3">
+                        <i class="bi bi-people-fill"></i> Roster (<%= registeredCount %>)
+                      </a>
+                      <form action="/admin/events/<%= event.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this event? All student passes for this event will be permanently revoked.');">
+                        <button type="submit" class="btn btn-sm btn-glass-secondary py-1 px-2 text-danger" title="Delete Event">
+                          <i class="bi bi-trash3-fill"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function filterAdminEvents() {
+      const query = document.getElementById('adminSearchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#adminEventsTable tbody tr');
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(query)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

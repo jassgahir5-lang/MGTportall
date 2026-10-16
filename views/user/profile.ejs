@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile & Digital ID — Campus Event Portal</title>
+  <meta name="description" content="Manage your campus credentials, academic department, digital student card, and account security.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-portal sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="/user/dashboard">
+        <div class="brand-icon-nav"><i class="bi bi-calendar2-event-fill"></i></div>
+        <span>CAMPUS NEXUS</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/user/dashboard" class="btn-nav-logout">
+          <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+
+        <% if (message) { %>
+          <div class="alert-liquid alert-liquid-success mb-4 animate-in" role="alert">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div><%= message %></div>
+          </div>
+        <% } %>
+
+        <% if (error) { %>
+          <div class="alert-liquid alert-liquid-danger mb-4 animate-in" role="alert">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <div><%= error %></div>
+          </div>
+        <% } %>
+
+        <div class="student-id-card mb-5 animate-in">
+          <div class="row align-items-center g-4">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="student-avatar-lg">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1 fs-8">
+                      <span class="dot" style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block; margin-right: 4px;"></span>
+                      Verified Enrolled Student
+                    </span>
+                    <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-25 px-2 py-1 fs-8">Term: Fall 2026</span>
+                  </div>
+                  <h3 class="fw-extrabold text-white mb-0" style="letter-spacing: -0.03em;"><%= userProfile.name %></h3>
+                  <small class="text-white-50"><%= userProfile.email %></small>
+                </div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-3 text-white fs-8 pt-2">
+                <div>
+                  <span class="text-white-50 d-block fs-8 text-uppercase tracking-wider">Department</span>
+                  <strong><%= userProfile.department_name || 'General Studies' %></strong>
+                </div>
+                <div class="border-start border-white border-opacity-25 ps-3">
+                  <span class="text-white-50 d-block fs-8 text-uppercase tracking-wider">Account Role</span>
+                  <strong class="text-info text-uppercase">Student Pass Holder</strong>
+                </div>
+                <div class="border-start border-white border-opacity-25 ps-3">
+                  <span class="text-white-50 d-block fs-8 text-uppercase tracking-wider">ID Pass Token</span>
+                  <strong style="font-family: monospace;">#STU-00<%= userProfile.id %></strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 text-center text-md-end">
+              <div class="p-3 rounded-4 d-inline-block bg-white shadow-lg text-center">
+                <i class="bi bi-qr-code text-dark display-5 d-block mb-1"></i>
+                <small class="text-muted fw-bold fs-8 d-block" style="font-family: monospace;">GATE IDENTIFIER</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+
+          <div class="col-lg-6">
+            <div class="glass-form-card p-4 p-md-4 h-100 animate-in animate-delay-1">
+              
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-person-vcard text-primary fs-5"></i>
+                <h5 class="fw-bold mb-0">Student Profile</h5>
+              </div>
+              <p class="text-secondary fs-7 mb-4">Manage your display name and academic department assignment.</p>
+
+              <form action="/user/profile/update" method="POST" id="profileUpdateForm">
+                
+                <div class="mb-3">
+                  <label class="form-label-glass">
+                    <i class="bi bi-person"></i> Full Legal Name
+                  </label>
+                  <input type="text" name="name" id="profileName" class="form-control form-control-glass" value="<%= userProfile.name %>" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label-glass">
+                    <i class="bi bi-envelope"></i> Institutional Email
+                  </label>
+                  <input type="email" id="profileEmail" class="form-control form-control-glass" value="<%= userProfile.email %>" disabled style="opacity: 0.7; background: rgba(0,0,0,0.04);">
+                  <small class="text-muted fs-8">College emails are managed centrally by the registrar.</small>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label-glass">
+                    <i class="bi bi-building"></i> Academic Department
+                  </label>
+                  <select name="department_id" id="profileDept" class="form-select form-select-glass">
+                    <option value="">— Select Department —</option>
+                    <% departments.forEach(dept => { %>
+                      <option value="<%= dept.id %>" <%= userProfile.department_id === dept.id ? 'selected' : '' %>>
+                        <%= dept.name %>
+                      </option>
+                    <% }); %>
+                  </select>
+                </div>
+
+                <button type="submit" id="saveProfileBtn" class="btn-liquid w-100 py-2">
+                  <i class="bi bi-check2-circle"></i> Save Profile Changes
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="glass-form-card p-4 p-md-4 h-100 animate-in animate-delay-2">
+              
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-shield-lock text-warning fs-5"></i>
+                <h5 class="fw-bold mb-0">Account Security</h5>
+              </div>
+              <p class="text-secondary fs-7 mb-4">Update your password to ensure secure pass issuance.</p>
+
+              <form action="/user/profile/change-password" method="POST" id="passwordChangeForm">
+                
+                <div class="mb-3">
+                  <label class="form-label-glass">
+                    <i class="bi bi-key"></i> Current Password
+                  </label>
+                  <input type="password" name="currentPassword" id="currentPassword" class="form-control form-control-glass" placeholder="••••••••" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label-glass">
+                    <i class="bi bi-lock"></i> New Password
+                  </label>
+                  <input type="password" name="newPassword" id="newPassword" class="form-control form-control-glass" placeholder="••••••••" required oninput="checkPasswordStrength(this.value)">
+                </div>
+
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center mb-1 fs-8">
+                    <span class="text-secondary">Password Security Rating</span>
+                    <span id="strengthLabel" class="fw-bold text-muted">Enter password</span>
+                  </div>
+                  <div class="progress-liquid" style="height: 6px;">
+                    <div id="strengthMeter" class="progress-bar" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <button type="submit" id="updatePasswordBtn" class="btn-liquid-outline w-100 py-2">
+                  <i class="bi bi-shield-check"></i> Update Password Credentials
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div class="glass-panel p-4 mt-4 animate-in animate-delay-3">
+          <h6 class="fw-bold mb-3"><i class="bi bi-award-fill text-warning me-2"></i>Campus Activity Credential Privileges</h6>
+          <div class="row g-3 fs-7 text-secondary">
+            <div class="col-md-4">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-patch-check-fill text-success fs-5"></i>
+                <div>
+                  <strong class="text-dark d-block">Automatic Event Access</strong>
+                  <span>Instant RSVP to all departmental guest lectures.</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-qr-code-scan text-primary fs-5"></i>
+                <div>
+                  <strong class="text-dark d-block">Digital Gate Clearance</strong>
+                  <span>Direct QR turnstile entry without paper slips.</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-check-fill text-info fs-5"></i>
+                <div>
+                  <strong class="text-dark d-block">Transcript Endorsement</strong>
+                  <span>Co-curricular attendance synced to academic records.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function checkPasswordStrength(val) {
+      const meter = document.getElementById('strengthMeter');
+      const label = document.getElementById('strengthLabel');
+
+      if (!val) {
+        meter.style.width = '0%';
+        label.innerText = 'Enter password';
+        label.className = 'fw-bold text-muted';
+        return;
+      }
+
+      let score = 0;
+      if (val.length >= 6) score += 25;
+      if (val.length >= 10) score += 25;
+      if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score += 25;
+      if (/[0-9]/.test(val) || /[^A-Za-z0-9]/.test(val)) score += 25;
+
+      meter.style.width = score + '%';
+      if (score <= 25) {
+        meter.className = 'progress-bar bg-danger';
+        label.innerText = 'Weak';
+        label.className = 'fw-bold text-danger';
+      } else if (score <= 50) {
+        meter.className = 'progress-bar bg-warning';
+        label.innerText = 'Moderate';
+        label.className = 'fw-bold text-warning';
+      } else if (score <= 75) {
+        meter.className = 'progress-bar bg-info';
+        label.innerText = 'Good';
+        label.className = 'fw-bold text-info';
+      } else {
+        meter.className = 'progress-bar bg-success';
+        label.innerText = 'Very Strong';
+        label.className = 'fw-bold text-success';
+      }
+    }
+  </script>
+</body>
+</html>

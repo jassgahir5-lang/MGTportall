@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Campus Event & Pass Portal</title>
+  <meta name="description" content="Access campus events, verify registrations, and manage digital student entry passes.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <div class="auth-split-wrapper">
+    <div class="container" style="max-width: 1040px;">
+      <div class="row g-0 align-items-stretch shadow-lg" style="border-radius: var(--radius-xl); overflow: hidden;">
+
+        <div class="col-lg-6 auth-showcase-box">
+          <div>
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="brand-icon-nav" style="width: 46px; height: 46px; font-size: 1.3rem;">
+                <i class="bi bi-calendar2-event-fill"></i>
+              </div>
+              <div>
+                <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">CAMPUS NEXUS</h4>
+                <small class="text-white-50" style="font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase;">Unified Event Ecosystem</small>
+              </div>
+            </div>
+
+            <div class="hero-badge mb-3">
+              <span class="dot"></span> Official Campus Portal
+            </div>
+
+            <h2 class="fw-extrabold text-white mb-3" style="font-size: 2rem; letter-spacing: -0.03em; line-height: 1.2;">
+              Discover. Reserve.<br><span style="background: var(--grad-liquid); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Attend in Seconds.</span>
+            </h2>
+
+            <p class="text-white-50 fs-6 mb-4" style="line-height: 1.6;">
+              Experience friction-free event management with real-time seat reservation, cryptographic QR entry passes, and automated attendee check-in.
+            </p>
+
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-md); padding: 14px 16px;">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-qr-code-scan text-info"></i>
+                    <span class="fw-bold text-white fs-6">Instant QR</span>
+                  </div>
+                  <small class="text-white-50" style="font-size: 0.75rem;">Gate entry verification</small>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-md); padding: 14px 16px;">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i>
+                    <span class="fw-bold text-white fs-6">Live Roster</span>
+                  </div>
+                  <small class="text-white-50" style="font-size: 0.75rem;">Real-time capacity tracking</small>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-md); padding: 14px 16px;">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-shield-check text-success"></i>
+                    <span class="fw-bold text-white fs-6">Verified IDs</span>
+                  </div>
+                  <small class="text-white-50" style="font-size: 0.75rem;">Departmental authentication</small>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-md); padding: 14px 16px;">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-file-earmark-pdf text-danger"></i>
+                    <span class="fw-bold text-white fs-6">PDF Passes</span>
+                  </div>
+                  <small class="text-white-50" style="font-size: 0.75rem;">Printable & mobile-ready</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center justify-content-between">
+            <span class="text-white-50 fs-7"><i class="bi bi-geo-alt-fill text-primary me-1"></i> Central Campus Venues Active</span>
+            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1 fs-8">System Online</span>
+          </div>
+        </div>
+
+        <div class="col-lg-6 auth-card-side d-flex flex-column justify-content-center">
+          
+          <div class="mb-4">
+            <h3 class="fw-extrabold text-dark mb-1" style="letter-spacing: -0.03em;">Welcome Back</h3>
+            <p class="text-secondary fs-7 mb-0">Sign in with your academic credentials to manage your passes.</p>
+          </div>
+
+          <% if (error) { %>
+            <div class="alert-liquid alert-liquid-danger mb-4" role="alert">
+              <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+              <div><%= error %></div>
+            </div>
+          <% } %>
+
+          <form action="/auth/login" method="POST">
+            
+            <div class="mb-3">
+              <label class="form-label-glass">
+                <i class="bi bi-envelope-at"></i> University Email Address
+              </label>
+              <div class="input-group input-group-glass">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" name="email" class="form-control form-control-glass" placeholder="student@college.edu" required autofocus>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label-glass mb-0">
+                  <i class="bi bi-shield-lock"></i> Password
+                </label>
+              </div>
+              <div class="input-group input-group-glass">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" name="password" class="form-control form-control-glass" placeholder="••••••••" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-liquid w-100 py-3 mb-4">
+              <span>Sign In to Portal</span>
+              <i class="bi bi-arrow-right fs-6"></i>
+            </button>
+          </form>
+
+          <div class="p-3 mb-4 rounded-3" style="background: rgba(99, 102, 241, 0.06); border: 1px dashed rgba(99, 102, 241, 0.3);">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <i class="bi bi-info-circle-fill text-primary fs-7"></i>
+              <strong class="fs-8 text-primary text-uppercase tracking-wider">Quick Showcase Accounts</strong>
+            </div>
+            <div class="d-flex justify-content-between fs-8 text-secondary">
+              <span>Admin: <code>admin@college.edu</code></span>
+              <span>Student: <code>jazz@edu.in</code></span>
+            </div>
+          </div>
+
+          <div class="text-center pt-2 border-top border-light-subtle">
+            <p class="text-secondary fs-7 mb-0">New to Campus Portal? 
+              <a href="/auth/register" class="fw-bold text-primary text-decoration-none ms-1">Create Student Account</a>
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

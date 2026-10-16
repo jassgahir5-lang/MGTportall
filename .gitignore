@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Environment variables (contains database credentials and secrets)
+.env
+.env*.local
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Logs & temp files
+*.log
+.DS_Store
+Thumbs.db

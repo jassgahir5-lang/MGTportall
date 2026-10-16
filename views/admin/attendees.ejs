@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendee Roster — <%= event.title %></title>
+  <meta name="description" content="Official student attendance manifest and entry pass validation roster for <%= event.title %>.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-portal sticky-top py-3 no-print">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard">
+        <div class="brand-icon-nav" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <span>CAMPUS ATTENDEE ROSTER</span>
+      </a>
+      <a href="/admin/dashboard" class="btn-nav-logout">
+        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+
+    <div class="glass-panel p-4 mb-4 animate-in">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge-cat-glass"><%= event.category_name || 'Campus Event' %></span>
+            <span class="text-secondary fs-8"><i class="bi bi-geo-alt-fill text-primary me-1"></i><%= event.venue_name || 'Main Hall' %></span>
+            <span class="text-secondary fs-8"><i class="bi bi-calendar-event-fill text-info me-1"></i><%= new Date(event.start_time).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %></span>
+          </div>
+          <h2 class="fw-extrabold mb-1" style="letter-spacing: -0.03em;"><%= event.title %></h2>
+          <p class="text-secondary fs-7 mb-0">Official student entry pass manifest and gate check-in roster.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 no-print flex-wrap">
+          <a href="/admin/events/<%= event.id %>/export-csv" class="btn-liquid py-2 px-3 fs-8">
+            <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export CSV
+          </a>
+          <button class="btn-liquid-outline py-2 px-3 fs-8" onclick="window.print()">
+            <i class="bi bi-printer-fill"></i> Print Roster
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <% 
+      const totalEnrolled = attendees.length;
+      const capacity = parseInt(event.capacity || 1, 10);
+      const remainingSeats = Math.max(capacity - totalEnrolled, 0);
+      const percentFilled = Math.min(Math.round((totalEnrolled / capacity) * 100), 100);
+    %>
+    <div class="row g-3 mb-4 animate-in animate-delay-1">
+      <div class="col-6 col-md-4">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Enrolled Students</span>
+            <div class="stat-icon-wrap icon-liquid-emerald">
+              <i class="bi bi-person-check-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= totalEnrolled %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-check-circle-fill text-success"></i> Passes issued
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Seats Remaining</span>
+            <div class="stat-icon-wrap icon-liquid-indigo">
+              <i class="bi bi-diagram-3-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= remainingSeats %></div>
+            <div class="stat-subtext">
+              <i class="bi bi-hourglass-split text-primary"></i> Out of <%= capacity %> total
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="glass-stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="stat-label">Occupancy Utilization</span>
+            <div class="stat-icon-wrap icon-liquid-violet">
+              <i class="bi bi-pie-chart-fill"></i>
+            </div>
+          </div>
+          <div>
+            <div class="stat-value"><%= percentFilled %>%</div>
+            <div class="progress-liquid mt-2">
+              <div class="progress-bar <%= percentFilled >= 100 ? 'bg-danger' : '' %>" style="width: <%= percentFilled %>%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-table-card animate-in animate-delay-2">
+      <div class="glass-table-header">
+        <div>
+          <h5 class="fw-bold mb-0">Student Entry Manifest</h5>
+          <small class="text-secondary">Verify student identities against digital token numbers.</small>
+        </div>
+
+        <div class="search-box-glass no-print" style="min-width: 260px;">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" id="rosterSearchInput" class="form-control" placeholder="Search student name, email, token..." onkeyup="filterRoster()">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-glass-table align-middle" id="rosterTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student Details</th>
+              <th>College Email</th>
+              <th>Department</th>
+              <th>Pass Issued Time</th>
+              <th class="text-end">Pass Token ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (attendees.length === 0) { %>
+              <tr>
+                <td colspan="6" class="text-center py-5">
+                  <div class="py-4">
+                    <i class="bi bi-people text-muted fs-1 d-block mb-3"></i>
+                    <h5 class="fw-bold text-dark mb-1">No Student Registrations Yet</h5>
+                    <p class="text-secondary fs-7 mb-0">Registered students will appear here in real-time as they book passes.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } else { %>
+              <% attendees.forEach((student, index) => { %>
+                <% 
+                  const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                %>
+                <tr>
+                  <td class="fw-bold text-muted fs-7"><%= index + 1 %></td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold fs-8" style="width: 34px; height: 34px; background: var(--grad-liquid);">
+                        <%= initials %>
+                      </div>
+                      <div>
+                        <div class="fw-bold text-dark"><%= student.name %></div>
+                        <small class="text-success fs-8"><i class="bi bi-shield-fill-check"></i> Verified Student</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-secondary fs-7"><%= student.email %></td>
+                  <td>
+                    <span class="badge-cat-glass"><%= student.department_name || 'General' %></span>
+                  </td>
+                  <td class="text-secondary fs-7">
+                    <i class="bi bi-clock me-1 text-info"></i>
+                    <%= new Date(student.registered_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                  </td>
+                  <td class="text-end">
+                    <span class="ticket-id-badge text-dark" style="background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.25);">
+                      #TKN-00<%= student.reg_id %>
+                    </span>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function filterRoster() {
+      const query = document.getElementById('rosterSearchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#rosterTable tbody tr');
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(query)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
