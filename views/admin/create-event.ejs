@@ -80,24 +80,30 @@
                 <label class="form-label-glass">
                   <i class="bi bi-tag"></i> Category
                 </label>
-                <select name="category_id" id="inputCategory" class="form-select form-select-glass" required onchange="updateLivePreview()">
-                  <option value="">-- Select Category --</option>
-                  <% categories.forEach(cat => { %>
-                    <option value="<%= cat.id %>"><%= cat.name %></option>
-                  <% }); %>
-                </select>
+                <div class="input-group input-group-glass">
+                  <span class="input-group-text"><i class="bi bi-bookmark-fill"></i></span>
+                  <select name="category_id" id="inputCategory" class="form-select form-select-glass" required onchange="updateLivePreview()">
+                    <option value="">-- Select Category --</option>
+                    <% categories.forEach(cat => { %>
+                      <option value="<%= cat.id %>"><%= cat.name %></option>
+                    <% }); %>
+                  </select>
+                </div>
               </div>
 
               <div class="col-md-6">
                 <label class="form-label-glass">
                   <i class="bi bi-geo-alt"></i> Assigned Venue
                 </label>
-                <select name="venue_id" id="inputVenue" class="form-select form-select-glass" required onchange="updateLivePreview()">
-                  <option value="">-- Select Campus Venue --</option>
-                  <% venues.forEach(v => { %>
-                    <option value="<%= v.id %>" data-cap="<%= v.capacity %>"><%= v.name %> (Max Hall Cap: <%= v.capacity %>)</option>
-                  <% }); %>
-                </select>
+                <div class="input-group input-group-glass">
+                  <span class="input-group-text"><i class="bi bi-building"></i></span>
+                  <select name="venue_id" id="inputVenue" class="form-select form-select-glass" required onchange="updateLivePreview()">
+                    <option value="">-- Select Campus Venue --</option>
+                    <% venues.forEach(v => { %>
+                      <option value="<%= v.id %>" data-cap="<%= v.capacity %>"><%= v.name %> (Max Hall Cap: <%= v.capacity %>)</option>
+                    <% }); %>
+                  </select>
+                </div>
               </div>
             </div>
 

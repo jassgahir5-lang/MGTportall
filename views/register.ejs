@@ -129,14 +129,21 @@
             <div class="row g-3 mb-3">
               <div class="col-md-6">
                 <label class="form-label-glass">
-                  <i class="bi bi-building"></i> Department
+                  <i class="bi bi-building"></i> Academic Department
                 </label>
-                <select name="department_id" class="form-select form-select-glass" required>
-                  <option value="">-- Choose Academic Dept --</option>
-                  <% departments.forEach(dept => { %>
-                    <option value="<%= dept.id %>"><%= dept.name %></option>
-                  <% }); %>
-                </select>
+                <div class="input-group input-group-glass">
+                  <span class="input-group-text"><i class="bi bi-mortarboard-fill"></i></span>
+                  <select name="department_id" id="department_id" class="form-select form-select-glass" required>
+                    <option value="" disabled selected>-- Select Academic Department --</option>
+                    <% if (departments && departments.length > 0) { %>
+                      <% departments.forEach(dept => { %>
+                        <option value="<%= dept.id %>"><%= dept.name %></option>
+                      <% }); %>
+                    <% } else { %>
+                      <option value="" disabled>No departments loaded</option>
+                    <% } %>
+                  </select>
+                </div>
               </div>
 
               <div class="col-md-6">

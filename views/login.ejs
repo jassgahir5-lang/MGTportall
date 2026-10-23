@@ -105,6 +105,13 @@
             <p class="text-secondary fs-7 mb-0">Sign in with your academic credentials to manage your passes.</p>
           </div>
 
+          <% if (locals.success) { %>
+            <div class="alert-liquid alert-liquid-success mb-4" role="alert">
+              <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+              <div><%= success %></div>
+            </div>
+          <% } %>
+
           <% if (error) { %>
             <div class="alert-liquid alert-liquid-danger mb-4" role="alert">
               <i class="bi bi-exclamation-octagon-fill fs-5"></i>
@@ -112,7 +119,7 @@
             </div>
           <% } %>
 
-          <form action="/auth/login" method="POST">
+          <form action="/auth/login" method="POST" id="loginForm">
             
             <div class="mb-3">
               <label class="form-label-glass">
@@ -120,7 +127,7 @@
               </label>
               <div class="input-group input-group-glass">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input type="email" name="email" class="form-control form-control-glass" placeholder="student@college.edu" required autofocus>
+                <input type="email" name="email" id="loginEmail" class="form-control form-control-glass" placeholder="student@college.edu" required autofocus>
               </div>
             </div>
 
@@ -132,7 +139,7 @@
               </div>
               <div class="input-group input-group-glass">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password" class="form-control form-control-glass" placeholder="••••••••" required>
+                <input type="password" name="password" id="loginPassword" class="form-control form-control-glass" placeholder="••••••••" required>
               </div>
             </div>
 
@@ -142,16 +149,32 @@
             </button>
           </form>
 
-          <div class="p-3 mb-4 rounded-3" style="background: rgba(99, 102, 241, 0.06); border: 1px dashed rgba(99, 102, 241, 0.3);">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <i class="bi bi-info-circle-fill text-primary fs-7"></i>
-              <strong class="fs-8 text-primary text-uppercase tracking-wider">Quick Showcase Accounts</strong>
+          <div class="p-3 mb-4 rounded-3" style="background: rgba(99, 102, 241, 0.06); border: 1px dashed rgba(99, 102, 241, 0.35);">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-lightning-charge-fill text-warning fs-6"></i>
+                <strong class="fs-8 text-primary text-uppercase tracking-wider">Demo Quick Access (1-Click Fill)</strong>
+              </div>
             </div>
-            <div class="d-flex justify-content-between fs-8 text-secondary">
-              <span>Admin: <code>admin@college.edu</code></span>
-              <span>Student: <code>jazz@edu.in</code></span>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="quick-demo-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" onclick="fillCredentials('admin@college.edu', 'admin123')">
+                <i class="bi bi-shield-lock-fill"></i> Admin: admin@college.edu / admin123
+              </button>
+              <button type="button" class="quick-demo-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25" onclick="fillCredentials('jazz@edu.in', 'student123')">
+                <i class="bi bi-person-fill"></i> Student: jazz@edu.in / student123
+              </button>
             </div>
           </div>
+
+          <script>
+            function fillCredentials(email, password) {
+              document.getElementById('loginEmail').value = email;
+              document.getElementById('loginPassword').value = password;
+              const submitBtn = document.querySelector('#loginForm button[type="submit"]');
+              submitBtn.classList.add('pulse-glow');
+              setTimeout(() => submitBtn.classList.remove('pulse-glow'), 1000);
+            }
+          </script>
 
           <div class="text-center pt-2 border-top border-light-subtle">
             <p class="text-secondary fs-7 mb-0">New to Campus Portal? 

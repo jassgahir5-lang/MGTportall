@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
+const QRCode = require('qrcode');
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -15,8 +16,10 @@ exports.getDashboard = async (req, res) => {
       FROM events e
       LEFT JOIN categories c ON e.category_id = c.id
       LEFT JOIN venues v ON e.venue_id = v.id
-      ORDER BY e.created_at DESC
+      ORDER BY e.start_time ASC, e.created_at DESC
     `, [userId]);
+
+    const categoriesQuery = await db.query('SELECT * FROM categories ORDER BY name ASC');
 
     const myEventsQuery = await db.query(`
       SELECT 
@@ -33,9 +36,33 @@ exports.getDashboard = async (req, res) => {
       ORDER BY r.registered_at DESC
     `, [userId]);
 
+    // Generate real QR code tokens for all held passes
+    const myEventsWithQR = await Promise.all(
+      myEventsQuery.rows.map(async (ticket) => {
+        const qrPayload = JSON.stringify({
+          ticket_token: `TKN-00${ticket.ticket_id}`,
+          event: ticket.title,
+          student_id: userId,
+          student_name: req.session.user.name,
+          issued_at: ticket.registered_at
+        });
+        const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+          width: 260,
+          margin: 2,
+          color: { dark: '#0f172a', light: '#ffffff' }
+        }).catch(() => null);
+
+        return {
+          ...ticket,
+          qr_code: qrDataUrl
+        };
+      })
+    );
+
     res.render('user/dashboard', {
       events: eventsQuery.rows,
-      myEvents: myEventsQuery.rows,
+      categories: categoriesQuery.rows,
+      myEvents: myEventsWithQR,
       message: req.query.msg || null,
       error: req.query.err || null
     });

@@ -130,14 +130,17 @@
                   <label class="form-label-glass">
                     <i class="bi bi-building"></i> Academic Department
                   </label>
-                  <select name="department_id" id="profileDept" class="form-select form-select-glass">
-                    <option value="">— Select Department —</option>
-                    <% departments.forEach(dept => { %>
-                      <option value="<%= dept.id %>" <%= userProfile.department_id === dept.id ? 'selected' : '' %>>
-                        <%= dept.name %>
-                      </option>
-                    <% }); %>
-                  </select>
+                  <div class="input-group input-group-glass">
+                    <span class="input-group-text"><i class="bi bi-mortarboard-fill"></i></span>
+                    <select name="department_id" id="profileDept" class="form-select form-select-glass">
+                      <option value="">— Select Academic Department —</option>
+                      <% departments.forEach(dept => { %>
+                        <option value="<%= dept.id %>" <%= String(userProfile.department_id) === String(dept.id) ? 'selected' : '' %>>
+                          <%= dept.name %>
+                        </option>
+                      <% }); %>
+                    </select>
+                  </div>
                 </div>
 
                 <button type="submit" id="saveProfileBtn" class="btn-liquid w-100 py-2">

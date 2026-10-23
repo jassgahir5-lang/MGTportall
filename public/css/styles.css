@@ -1167,41 +1167,101 @@ body {
 .form-select-glass {
   border-radius: var(--radius-sm);
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.75);
+  background-color: #ffffff !important;
+  color: var(--clr-text-primary) !important;
   backdrop-filter: blur(12px);
   border: 1.5px solid var(--glass-border-subtle);
   font-size: 0.92rem;
-  color: var(--clr-text-primary);
+  font-weight: 500;
   transition: all var(--transition-fast);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
+.form-select-glass {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 16px 12px !important;
+  padding-right: 42px !important;
+}
+
+.form-select-glass option,
+select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 10px 14px;
+}
+
+.form-select-glass option:hover,
+select option:hover {
+  background-color: #e0e7ff !important;
+  color: #4338ca !important;
+}
+
 .form-control-glass:focus,
 .form-select-glass:focus {
-  background: #ffffff;
+  background-color: #ffffff !important;
   border-color: var(--clr-primary-500);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14), var(--shadow-glass-sm);
   outline: none;
 }
 
+.input-group-glass {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+}
+
 .input-group-glass .input-group-text {
-  background: rgba(248, 250, 252, 0.85);
+  background: rgba(248, 250, 252, 0.95);
   backdrop-filter: blur(12px);
   border: 1.5px solid var(--glass-border-subtle);
   border-right: none;
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
   color: var(--clr-text-muted);
   padding: 12px 16px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
 }
 
-.input-group-glass .form-control {
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  border-left: none;
+.input-group-glass .form-control,
+.input-group-glass .form-select-glass,
+.input-group-glass .form-select {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+  border-left: none !important;
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
 }
 
 .input-group-glass:focus-within .input-group-text {
   border-color: var(--clr-primary-500);
   color: var(--clr-primary-600);
+  background-color: #f1f5f9;
+}
+
+.quick-demo-pill {
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.quick-demo-pill:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.95);
 }
 
 .auth-split-wrapper {

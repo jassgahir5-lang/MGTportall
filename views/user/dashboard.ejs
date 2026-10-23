@@ -199,22 +199,22 @@
 
     </div>
 
-    <div class="d-flex align-items-center gap-2 mb-4 overflow-x-auto pb-2 animate-in animate-delay-3">
+    <div class="d-flex align-items-center gap-2 mb-4 overflow-x-auto pb-2 animate-in animate-delay-3" id="categoryPillContainer">
       <span class="filter-pill active" onclick="setCategoryFilter('', this)">
-        <i class="bi bi-collection me-1"></i> All Categories
+        <i class="bi bi-collection me-1"></i> All Categories (<%= events.length %>)
       </span>
-      <span class="filter-pill" onclick="setCategoryFilter('Technical', this)">
-        <i class="bi bi-cpu me-1"></i> Technical
-      </span>
-      <span class="filter-pill" onclick="setCategoryFilter('Cultural Fest', this)">
-        <i class="bi bi-music-note-beamed me-1"></i> Cultural Fest
-      </span>
-      <span class="filter-pill" onclick="setCategoryFilter('Sports', this)">
-        <i class="bi bi-trophy me-1"></i> Sports
-      </span>
-      <span class="filter-pill" onclick="setCategoryFilter('Workshop', this)">
-        <i class="bi bi-tools me-1"></i> Workshops & Seminars
-      </span>
+      <% if (locals.categories && categories.length > 0) { %>
+        <% categories.forEach(cat => { %>
+          <span class="filter-pill" onclick="setCategoryFilter('<%= cat.name %>', this)">
+            <%= cat.name %>
+          </span>
+        <% }); %>
+      <% } else { %>
+        <span class="filter-pill" onclick="setCategoryFilter('Technical', this)"><i class="bi bi-cpu me-1"></i> Technical</span>
+        <span class="filter-pill" onclick="setCategoryFilter('Cultural', this)"><i class="bi bi-music-note-beamed me-1"></i> Cultural</span>
+        <span class="filter-pill" onclick="setCategoryFilter('Sports', this)"><i class="bi bi-trophy me-1"></i> Sports</span>
+        <span class="filter-pill" onclick="setCategoryFilter('Workshops', this)"><i class="bi bi-tools me-1"></i> Workshops</span>
+      <% } %>
     </div>
 
     <div class="tab-content" id="portalTabContent">
@@ -302,23 +302,116 @@
                       </div>
                     </div>
 
-                    <div class="mt-auto">
-                      <% if (event.is_registered) { %>
-                        <button class="btn btn-glass-secondary w-100 py-2 text-success fw-bold" onclick="document.getElementById('tickets-tab').click(); window.location.hash = 'portalTabs';">
-                          <i class="bi bi-check-circle-fill me-1"></i> Pass Confirmed • View Pass
+                    <div class="mt-auto d-flex flex-column gap-2">
+                      <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-glass-secondary flex-grow-1 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#eventDetailsModal<%= event.id %>">
+                          <i class="bi bi-info-circle me-1"></i> Details & Agenda
                         </button>
-                      <% } else if (isFull) { %>
-                        <button class="btn btn-glass-secondary w-100 py-2 text-muted fw-semibold" disabled>
-                          <i class="bi bi-slash-circle me-1"></i> Event Fully Booked
-                        </button>
-                      <% } else { %>
-                        <button type="button" class="btn-liquid w-100 py-2" data-bs-toggle="modal" data-bs-target="#registerModal<%= event.id %>">
-                          <span>Reserve My Seat</span>
-                          <i class="bi bi-arrow-right"></i>
-                        </button>
-                      <% } %>
+                        <% if (event.is_registered) { %>
+                          <button class="btn btn-sm btn-glass-secondary text-success fw-bold px-3" onclick="document.getElementById('tickets-tab').click(); window.location.hash = 'portalTabs';">
+                            <i class="bi bi-check2-circle"></i> Pass
+                          </button>
+                        <% } else if (isFull) { %>
+                          <button class="btn btn-sm btn-glass-secondary text-muted fw-semibold px-3" disabled>
+                            Full
+                          </button>
+                        <% } else { %>
+                          <button type="button" class="btn-liquid btn-sm px-3" data-bs-toggle="modal" data-bs-target="#registerModal<%= event.id %>">
+                            <span>Book</span> <i class="bi bi-arrow-right"></i>
+                          </button>
+                        <% } %>
+                      </div>
                     </div>
 
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comprehensive Event Details Modal -->
+              <div class="modal fade" id="eventDetailsModal<%= event.id %>" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content modal-content-glass">
+                    <div class="modal-header border-0 pb-0 pt-4 px-4">
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="brand-icon-nav" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                          <i class="bi bi-calendar2-week-fill"></i>
+                        </div>
+                        <div>
+                          <span class="badge-cat-glass mb-1"><%= event.category_name || 'Campus Event' %></span>
+                          <h4 class="fw-bold mb-0 text-dark" style="letter-spacing: -0.02em;"><%= event.title %></h4>
+                        </div>
+                      </div>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                      <% if (event.poster_url) { %>
+                        <div class="mb-4 rounded-4 overflow-hidden position-relative shadow-sm" style="max-height: 240px;">
+                          <img src="<%= event.poster_url %>" alt="<%= event.title %>" class="w-100" style="object-fit: cover; height: 240px;">
+                          <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(0deg, rgba(15,23,42,0.85) 0%, transparent 100%);">
+                            <span class="badge bg-primary px-3 py-1 fs-8"><i class="bi bi-geo-alt-fill me-1"></i> <%= event.venue_name || 'Campus Hall' %></span>
+                          </div>
+                        </div>
+                      <% } %>
+
+                      <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                          <div class="p-3 rounded-3 bg-white bg-opacity-70 border border-light-subtle h-100">
+                            <small class="text-uppercase fw-bold text-muted fs-8 tracking-wider d-block mb-1">Schedule & Duration</small>
+                            <div class="fw-bold text-dark fs-7"><i class="bi bi-clock-fill text-info me-1"></i> Starts: <%= new Date(event.start_time).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' }) %></div>
+                            <% if (event.end_time) { %>
+                              <div class="text-secondary fs-8 mt-1"><i class="bi bi-hourglass-bottom text-warning me-1"></i> Concludes: <%= new Date(event.end_time).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %></div>
+                            <% } %>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6">
+                          <div class="p-3 rounded-3 bg-white bg-opacity-70 border border-light-subtle h-100">
+                            <small class="text-uppercase fw-bold text-muted fs-8 tracking-wider d-block mb-1">Venue & Seating Audit</small>
+                            <div class="fw-bold text-dark fs-7"><i class="bi bi-geo-alt-fill text-primary me-1"></i> <%= event.venue_name || 'Main Campus Hall' %></div>
+                            <div class="text-secondary fs-8 mt-1">
+                              Capacity: <strong><%= capacity %> Seats</strong> • 
+                              <span class="<%= isFull ? 'text-danger fw-bold' : 'text-success fw-bold' %>">
+                                <%= seatsLeft %> Seats Remaining (<%= percentFilled %>% filled)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-text-paragraph text-primary me-1"></i> Event Overview & Guidelines</h6>
+                        <p class="text-secondary fs-7" style="line-height: 1.7; white-space: pre-line;"><%= event.description %></p>
+                      </div>
+
+                      <div class="p-3 mb-4 rounded-3" style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <h6 class="fw-bold text-primary fs-8 text-uppercase tracking-wider mb-2"><i class="bi bi-stars me-1"></i> Included Attendee Privileges</h6>
+                        <div class="row g-2 fs-8 text-secondary">
+                          <div class="col-sm-6"><i class="bi bi-check2-circle text-success me-1"></i> Cryptographic Digital QR Gate Pass</div>
+                          <div class="col-sm-6"><i class="bi bi-check2-circle text-success me-1"></i> Academic Attendance Credit Logged</div>
+                          <div class="col-sm-6"><i class="bi bi-check2-circle text-success me-1"></i> Certificate of Participation Eligible</div>
+                          <div class="col-sm-6"><i class="bi bi-check2-circle text-success me-1"></i> Refreshments & Interactive Q&A</div>
+                        </div>
+                      </div>
+
+                      <div class="d-flex justify-content-end gap-2 pt-2 border-top border-light-subtle">
+                        <button type="button" class="btn btn-glass-secondary px-4" data-bs-dismiss="modal">Close</button>
+                        <% if (event.is_registered) { %>
+                          <button class="btn btn-glass-secondary text-success fw-bold px-4" data-bs-dismiss="modal" onclick="document.getElementById('tickets-tab').click(); window.location.hash = 'portalTabs';">
+                            <i class="bi bi-ticket-perforated-fill me-1"></i> View My Issued Pass
+                          </button>
+                        <% } else if (isFull) { %>
+                          <button class="btn btn-glass-secondary text-muted fw-semibold px-4" disabled>
+                            <i class="bi bi-slash-circle me-1"></i> Fully Booked
+                          </button>
+                        <% } else { %>
+                          <button type="button" class="btn-liquid px-4" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal<%= event.id %>">
+                            <span>Proceed to Reserve Seat</span>
+                            <i class="bi bi-arrow-right"></i>
+                          </button>
+                        <% } %>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -461,8 +554,12 @@
                       <h4 class="fw-bold mb-1" style="letter-spacing: -0.02em;"><%= ticket.title %></h4>
                       <p class="text-secondary fs-8 mb-4">Present this digital QR token at the <%= ticket.venue_name %> gate checkpoint.</p>
 
-                      <div class="p-4 rounded-4 mb-3 d-inline-block" style="background: white; border: 2px dashed #cbd5e1; box-shadow: 0 12px 30px rgba(0,0,0,0.08);">
-                        <i class="bi bi-qr-code-scan display-1 text-dark"></i>
+                      <div class="p-3 rounded-4 mb-3 d-inline-block" style="background: white; border: 2px dashed #cbd5e1; box-shadow: 0 12px 30px rgba(0,0,0,0.08);">
+                        <% if (ticket.qr_code) { %>
+                          <img src="<%= ticket.qr_code %>" alt="QR Pass" class="img-fluid" style="width: 220px; height: 220px; border-radius: 8px;">
+                        <% } else { %>
+                          <i class="bi bi-qr-code-scan display-1 text-dark"></i>
+                        <% } %>
                       </div>
 
                       <h6 class="fw-bold text-dark mb-0"><%= user.name %></h6>
@@ -587,25 +684,29 @@
 
     function setCategoryFilter(category, element) {
       activeCategory = category;
-      document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
-      element.classList.add('active');
+      document.querySelectorAll('#categoryPillContainer .filter-pill').forEach(el => el.classList.remove('active'));
+      if (element) element.classList.add('active');
       filterEvents();
     }
 
     function filterEvents() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const cards = document.querySelectorAll('#eventCardGrid .col-12');
+      const searchEl = document.getElementById('searchInput');
+      const query = (searchEl ? searchEl.value : '').toLowerCase().trim();
+      const cards = document.querySelectorAll('#eventCardGrid > div');
 
+      let visible = 0;
       cards.forEach(card => {
         const title = card.querySelector('h5')?.innerText.toLowerCase() || '';
+        const desc = card.querySelector('.event-desc')?.innerText.toLowerCase() || '';
         const venue = card.querySelector('.bi-geo-alt-fill')?.parentElement?.innerText.toLowerCase() || '';
         const catBadge = card.querySelector('.badge-cat-glass')?.innerText.toLowerCase() || '';
 
-        const matchesSearch = title.includes(query) || venue.includes(query);
+        const matchesSearch = !query || title.includes(query) || venue.includes(query) || desc.includes(query);
         const matchesCategory = !activeCategory || catBadge.includes(activeCategory.toLowerCase());
 
         if (matchesSearch && matchesCategory) {
           card.style.display = '';
+          visible++;
         } else {
           card.style.display = 'none';
         }

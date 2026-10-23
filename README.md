@@ -7,17 +7,29 @@ A full-stack, responsive event management system designed for campus events. It 
 ## ✨ Features
 
 ### 👤 User / Student Portal
-- **Authentication**: Secure sign-up and login with password hashing (`bcryptjs`) and session management.
-- **Event Discovery & Registration**: Browse upcoming campus events and register with a single click.
-- **Registration Management**: View your registered events and cancel registrations if plans change.
-- **Profile Settings**: Update personal details and change account passwords securely.
+- **Robust Student Onboarding**: Select from all 12 academic departments with full mobile/desktop cross-browser compatibility.
+- **Dynamic Event Discovery**: Live search bar and categorized filters (Technical, Cultural, Sports, Workshops, Management).
+- **Comprehensive Event Details & Guidelines**: Deep-dive modals showing event agendas, timings, seat utilization, venue maps, and eligibility perks.
+- **Real-Time Cryptographic QR Passes**: High-resolution scannable QR tokens dynamically generated for every issued student entry permit.
+- **Profile & Credential Management**: Update legal display names, academic department assignments, and security passwords.
 
-### 🛡️ Admin Dashboard
-- **Overview & Analytics**: View total events, total attendees, and registration trends at a glance.
-- **Event Creation & Management**: Create new events with details like date, time, venue, and descriptions.
-- **Attendee Tracking**: Real-time list of students registered for each event.
-- **CSV Export**: Export attendee lists directly to CSV for attendance tracking and reporting.
-- **Event Moderation**: Delete or modify existing events.
+### 🛡️ Admin Command Center
+- **Executive Analytics & Metrics**: Total events, enrolled students, active registrations, occupancy fill rate, and category breakdowns.
+- **Event Studio & Publishing**: Schedule new events with venue capacities, poster banners, and category tagging.
+- **Full Event Editing & Status Moderation**: Modify schedules, venues, capacities, and switch event status (`Upcoming`, `Live Now`, `Completed`, `Cancelled`).
+- **Real-Time Gate Attendance Scanner**: 1-click verified check-in for registered student QR passes with live attendance counters.
+- **Student Directory & Moderation**: Review all registered student profiles, audited departments, and toggle account access (Active / Suspended).
+- **Roster Export**: Download CSV student entry manifests with token IDs, check-in status, and timestamps.
+- **Safe Cascading Deletion**: Clean removal of events and all associated passes without database constraint errors.
+
+---
+
+## 🔑 Quick Showcase Credentials
+| Role | Email | Password |
+|---|---|---|
+| **System Admin** | `admin@college.edu` | `admin123` |
+| **Enrolled Student** | `jazz@edu.in` | `student123` |
+*(1-click auto-fill buttons are also available directly on the login screen!)*
 
 ---
 

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Event — Campus Admin Studio</title>
+  <meta name="description" content="Update existing campus activities, modify venue capacities, schedules, or status.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="liquid-canvas">
+    <div class="liquid-orb liquid-orb-1"></div>
+    <div class="liquid-orb liquid-orb-2"></div>
+    <div class="liquid-orb liquid-orb-3"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-portal sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard">
+        <div class="brand-icon-nav" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+          <i class="bi bi-pencil-square"></i>
+        </div>
+        <span>CAMPUS ADMIN STUDIO</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/admin/dashboard" class="btn-nav-logout">
+          <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-lg-7">
+        <div class="glass-form-card p-4 p-md-5 animate-in">
+          
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <div class="hero-badge mb-2" style="font-size: 0.72rem; padding: 4px 14px;">
+                <span class="dot"></span> EVENT MODERATION & EDITOR
+              </div>
+              <h3 class="fw-extrabold text-dark mb-1" style="letter-spacing: -0.03em;">Edit Campus Event</h3>
+              <p class="text-secondary fs-7 mb-0">Update event schedules, change venues, adjust seating capacities, or modify event status.</p>
+            </div>
+          </div>
+
+          <% if (error) { %>
+            <div class="alert-liquid alert-liquid-danger mb-4" role="alert">
+              <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+              <div><%= error %></div>
+            </div>
+          <% } %>
+
+          <% 
+            const formatForInput = (dateVal) => {
+              if (!dateVal) return '';
+              const d = new Date(dateVal);
+              const pad = n => String(n).padStart(2, '0');
+              return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            };
+          %>
+
+          <form action="/admin/events/<%= event.id %>/edit" method="POST" id="editEventForm">
+            
+            <div class="mb-3">
+              <label class="form-label-glass">
+                <i class="bi bi-fonts"></i> Event Title
+              </label>
+              <input type="text" name="title" id="inputTitle" class="form-control form-control-glass" value="<%= event.title %>" required oninput="updateLivePreview()">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label-glass">
+                <i class="bi bi-card-text"></i> Event Description & Guidelines
+              </label>
+              <textarea name="description" id="inputDesc" class="form-control form-control-glass" rows="4" required oninput="updateLivePreview()"><%= event.description %></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-tag"></i> Category
+                </label>
+                <div class="input-group input-group-glass">
+                  <span class="input-group-text"><i class="bi bi-bookmark-fill"></i></span>
+                  <select name="category_id" id="inputCategory" class="form-select form-select-glass" required onchange="updateLivePreview()">
+                    <option value="">-- Select Category --</option>
+                    <% categories.forEach(cat => { %>
+                      <option value="<%= cat.id %>" <%= String(event.category_id) === String(cat.id) ? 'selected' : '' %>>
+                        <%= cat.name %>
+                      </option>
+                    <% }); %>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-geo-alt"></i> Assigned Venue
+                </label>
+                <div class="input-group input-group-glass">
+                  <span class="input-group-text"><i class="bi bi-building"></i></span>
+                  <select name="venue_id" id="inputVenue" class="form-select form-select-glass" required onchange="updateLivePreview()">
+                    <option value="">-- Select Campus Venue --</option>
+                    <% venues.forEach(v => { %>
+                      <option value="<%= v.id %>" data-cap="<%= v.capacity %>" <%= String(event.venue_id) === String(v.id) ? 'selected' : '' %>>
+                        <%= v.name %> (Max: <%= v.capacity %>)
+                      </option>
+                    <% }); %>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-calendar-event"></i> Start Time
+                </label>
+                <input type="datetime-local" name="start_time" id="inputStartTime" class="form-control form-control-glass" value="<%= formatForInput(event.start_time) %>" required oninput="updateLivePreview()">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-calendar-check"></i> End Time
+                </label>
+                <input type="datetime-local" name="end_time" class="form-control form-control-glass" value="<%= formatForInput(event.end_time) %>" required>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-people"></i> Max Registration Capacity
+                </label>
+                <input type="number" name="capacity" id="inputCapacity" class="form-control form-control-glass" value="<%= event.capacity %>" min="1" required oninput="updateLivePreview()">
+                <small class="text-secondary fs-8">Seat bookings automatically lock when this limit is reached.</small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-glass">
+                  <i class="bi bi-activity"></i> Event Status
+                </label>
+                <div class="input-group input-group-glass">
+                  <span class="input-group-text"><i class="bi bi-toggles"></i></span>
+                  <select name="status" class="form-select form-select-glass">
+                    <option value="upcoming" <%= event.status === 'upcoming' ? 'selected' : '' %>>🟢 Upcoming (Open for Registrations)</option>
+                    <option value="ongoing" <%= event.status === 'ongoing' ? 'selected' : '' %>>🔵 Ongoing (Live Now)</option>
+                    <option value="completed" <%= event.status === 'completed' ? 'selected' : '' %>>⚪ Completed</option>
+                    <option value="cancelled" <%= event.status === 'cancelled' ? 'selected' : '' %>>🔴 Cancelled</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label-glass">
+                <i class="bi bi-image"></i> Event Poster Banner URL (Optional)
+              </label>
+              <input type="url" name="poster_url" class="form-control form-control-glass" value="<%= event.poster_url || '' %>" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
+              <a href="/admin/dashboard" class="btn btn-glass-secondary px-4">Cancel</a>
+              <button type="submit" class="btn-liquid px-4">
+                <i class="bi bi-check2-circle"></i> Save Changes & Update Portal
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="live-preview-box animate-in animate-delay-1">
+          <div class="preview-badge-floating">
+            <i class="bi bi-eye-fill me-1"></i> Live Portal Card Preview
+          </div>
+
+          <div class="event-card" style="margin-top: 10px;">
+            <div class="event-card-header">
+              <div class="date-ribbon-glass">
+                <span class="month" id="prevMonth">NOV</span>
+                <span class="day" id="prevDay">12</span>
+              </div>
+              <div class="d-flex flex-column align-items-end gap-1">
+                <span class="badge-cat-glass" id="prevCategory">Campus Event</span>
+                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1 fs-8">Open</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <h5 class="fw-bold mb-2" id="prevTitle"><%= event.title %></h5>
+              <p class="event-desc" id="prevDesc"><%= event.description %></p>
+
+              <div class="event-meta-pill">
+                <div class="event-meta-item">
+                  <i class="bi bi-geo-alt-fill text-primary"></i>
+                  <span><strong>Venue:</strong> <span id="prevVenue">Selected Venue</span></span>
+                </div>
+                <div class="event-meta-item">
+                  <i class="bi bi-clock-fill text-info"></i>
+                  <span><strong>Schedule:</strong> <span id="prevTime">Campus Local Time</span></span>
+                </div>
+              </div>
+
+              <div class="event-perks">
+                <span class="perk-tag"><i class="bi bi-qr-code"></i> Instant QR Pass</span>
+                <span class="perk-tag"><i class="bi bi-patch-check"></i> Attendance Credit</span>
+              </div>
+
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1 fs-8">
+                  <span class="text-secondary fw-semibold">Seat Utilization</span>
+                  <span class="fw-bold text-primary">0 / <span id="prevCapacity"><%= event.capacity %></span> seats (0%)</span>
+                </div>
+                <div class="progress-liquid">
+                  <div class="progress-bar" style="width: 5%;"></div>
+                </div>
+              </div>
+
+              <div class="mt-auto">
+                <button type="button" class="btn-liquid w-100 py-2" disabled>
+                  <span>Student View: Reserve Seat</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function updateLivePreview() {
+      const title = document.getElementById('inputTitle').value || 'Annual Campus Hackathon';
+      const desc = document.getElementById('inputDesc').value || 'Event guidelines, schedule details, and rules will appear here for students.';
+      const catSelect = document.getElementById('inputCategory');
+      const category = catSelect.options[catSelect.selectedIndex]?.text || 'General';
+      const venueSelect = document.getElementById('inputVenue');
+      const venue = venueSelect.options[venueSelect.selectedIndex]?.text.split('(')[0] || 'Main Auditorium';
+      const cap = document.getElementById('inputCapacity').value || '100';
+      const startTime = document.getElementById('inputStartTime').value;
+
+      document.getElementById('prevTitle').innerText = title;
+      document.getElementById('prevDesc').innerText = desc;
+      document.getElementById('prevCategory').innerText = category;
+      document.getElementById('prevVenue').innerText = venue;
+      document.getElementById('prevCapacity').innerText = cap;
+
+      if (startTime) {
+        const d = new Date(startTime);
+        const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        document.getElementById('prevMonth').innerText = months[d.getMonth()] || 'DATE';
+        document.getElementById('prevDay').innerText = d.getDate() || '1';
+        document.getElementById('prevTime').innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateLivePreview);
+  </script>
+</body>
+</html>
